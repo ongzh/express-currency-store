@@ -21,7 +21,6 @@ const getHistoricalRates = async (req, res, next) => {
   try {
     console.log("here");
     const { base_currency, target_currency, start, end } = req.query;
-
     res.json(
       await exchangeService.getHistoricalRates(
         base_currency,
