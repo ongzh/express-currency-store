@@ -18,10 +18,17 @@
   },
   "homepage": "https://github.com/ongzh/express-currency-store#readme",
   "dependencies": {
+    "@prisma/client": "^5.0.0",
     "axios": "^1.4.0",
-    "express": "^4.18.2"
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "node-cron": "^3.0.2",
+    "prisma": "^5.0.0"
   },
   "devDependencies": {
     "nodemon": "^3.0.1"
+  },
+  "prisma": {
+    "seed": "node prisma/seed.js"
   }
 }

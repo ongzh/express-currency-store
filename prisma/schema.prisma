@@ -1,0 +1,32 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+
+model Currency{
+    id Int @default(autoincrement()) @id
+    code String @unique
+    isCrypto Boolean 
+    exchangeRatesAsBase ExchangeRate[] @relation("baseCurrency")
+    exchangeRatesAsTarget ExchangeRate[] @relation("targetCurrency")
+}
+
+model ExchangeRate{
+    id Int @default(autoincrement()) @id
+    baseCurrency Currency @relation("baseCurrency", fields: [baseCurrencyId], references: [id])
+    baseCurrencyId Int
+    targetCurrency Currency @relation("targetCurrency", fields: [targetCurrencyId], references: [id])
+    targetCurrencyId Int
+    rate String
+    timeStamp DateTime
+}
+
+
