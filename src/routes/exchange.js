@@ -5,4 +5,5 @@ const exchangeController = require("../controllers/exchangeController");
 
 router.get("/rates", exchangeController.getExchangeRates);
 
+router.get("/historical-rates", exchangeController.getHistoricalRates);
 module.exports = router;

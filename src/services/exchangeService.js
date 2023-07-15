@@ -13,27 +13,7 @@ const updateExchangeRates = async (fiatList, cryptoList) => {
   await updateExchangeRatesToDb(cryptoBaseRates, currentTime);
 };
 
-//takes in rates in same format as GET /rates and update them to
-const updateExchangeRatesToDb = async (rates, currentTime) => {
-  for (const baseCur in rates) {
-    for (const targetCur in rates[baseCur]) {
-      await prisma.exchangeRate.create({
-        data: {
-          baseCurrency: {
-            connect: { code: baseCur },
-          },
-          targetCurrency: {
-            connect: { code: targetCur },
-          },
-
-          rate: rates[baseCur][targetCur],
-          timeStamp: currentTime,
-        },
-      });
-    }
-  }
-};
-
+//get latest exchange rates from db
 const getLatestExchangeRates = async (isCrypto) => {
   //get timestamp of latest exchange rate
   const maxTimestamp = await prisma.exchangeRate.findFirst({
@@ -76,6 +56,56 @@ const getLatestExchangeRates = async (isCrypto) => {
 
   return result;
 };
+
+const getHistoricalRates = async (baseCur, targetCur, startDate, endDate) => {
+  const rates = await prisma.exchangeRate.findMany({
+    where: {
+      baseCurrency: {
+        code: baseCur,
+      },
+      targetCurrency: {
+        code: targetCur,
+      },
+      timeStamp: {
+        gte: startDate,
+        lte: endDate,
+      },
+    },
+    orderBy: {
+      timeStamp: "asc",
+    },
+  });
+  let result = { results: [] };
+  for (const rate of rates) {
+    result.results.push({
+      timestamp: rate.timeStamp.getTime(),
+      value: rate.rate,
+    });
+  }
+  return result;
+};
+
+//takes in rates in same format as GET /rates and update them to
+const updateExchangeRatesToDb = async (rates, currentTime) => {
+  for (const baseCur in rates) {
+    for (const targetCur in rates[baseCur]) {
+      await prisma.exchangeRate.create({
+        data: {
+          baseCurrency: {
+            connect: { code: baseCur },
+          },
+          targetCurrency: {
+            connect: { code: targetCur },
+          },
+
+          rate: rates[baseCur][targetCur],
+          timeStamp: currentTime,
+        },
+      });
+    }
+  }
+};
+
 //return exchangeData in the form of {baseCur: {targetCur1: rate, targetCur2: rate, ...}...}
 const getLatestExchangeDataFromApi = async (baseCurs, targetCurs) => {
   let exchangeData = {};
@@ -97,4 +127,5 @@ const getLatestExchangeDataFromApi = async (baseCurs, targetCurs) => {
 module.exports = {
   updateExchangeRates,
   getLatestExchangeRates,
+  getHistoricalRates,
 };
