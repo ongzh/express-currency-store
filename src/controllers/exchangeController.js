@@ -6,8 +6,10 @@ const exchangeService = require("../services/exchangeService");
 const getExchangeRates = async (req, res, next) => {
   try {
     const { base } = req.query;
-    if (base != "crypto" && base != "fiat") {
-      throw new Error("Invalid base currency");
+    if (base === undefined) {
+      res.status(400).json({ error: "No base currency given" });
+    } else if (base != "crypto" && base != "fiat") {
+      res.status(400).json({ error: "Invalid base currency" });
     }
     const isCrypto = base == "crypto" ? true : false;
     res.json(await exchangeService.getLatestExchangeRates(isCrypto));
@@ -19,16 +21,23 @@ const getExchangeRates = async (req, res, next) => {
 
 const getHistoricalRates = async (req, res, next) => {
   try {
-    console.log("here");
     const { base_currency, target_currency, start, end } = req.query;
-    res.json(
-      await exchangeService.getHistoricalRates(
-        base_currency,
-        target_currency,
-        new Date(parseInt(start)),
-        end === undefined ? new Date() : new Date(parseInt(end))
-      )
-    );
+    const endDate = end === undefined ? new Date() : new Date(parseInt(end));
+    const startDate = new Date(parseInt(start));
+    if (base_currency === undefined || target_currency === undefined) {
+      res.status(400).json({ error: "No base or target currency given" });
+    } else if (isNaN(startDate) || isNaN(endDate)) {
+      res.status(400).json({ error: "Invalid start or end date given" });
+    } else {
+      res.json(
+        await exchangeService.getHistoricalRates(
+          base_currency,
+          target_currency,
+          startDate,
+          endDate
+        )
+      );
+    }
   } catch (err) {
     console.error(`Error while getting historical rates`, err.message);
     next(err);

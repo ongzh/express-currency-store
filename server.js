@@ -3,7 +3,7 @@ const app = express();
 const cron = require("node-cron");
 require("dotenv").config();
 const cronSchedule = process.env.CRON_SCHEDULE;
-const { updateExchangeRates } = require("./src/services/exchangeService");
+const updateService = require("./src/services/updateService");
 
 app.use(express.json()); //parse json
 const { quotes } = require("./src/utils/utils");
@@ -18,6 +18,6 @@ app.listen(port, () => {
   //run every 100 seconds
   cron.schedule(cronSchedule, () => {
     console.log("Updating exchange rates...");
-    updateExchangeRates(quotes.fiat, quotes.crypto);
+    updateService.updateExchangeRates(quotes.fiat, quotes.crypto);
   });
 });
