@@ -17,7 +17,7 @@ app.listen(port, () => {
   console.log(`Listening on port ${port}...`);
   //run every 100 seconds
   cron.schedule(cronSchedule, () => {
-    //console.log("Updating exchange rates...");
+    console.log("Updating exchange rates...");
     updateExchangeRates(quotes.fiat, quotes.crypto);
   });
 });

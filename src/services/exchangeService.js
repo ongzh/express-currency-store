@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 
 const updateExchangeRates = async (fiatList, cryptoList) => {
   const currentTime = new Date();
-  console.log(currentTime);
+  //console.log(currentTime);
   fiatBaseRates = await getLatestExchangeDataFromApi(fiatList, cryptoList);
   cryptoBaseRates = await getLatestExchangeDataFromApi(cryptoList, fiatList);
   //ensure timestamp is the same for all rates on each update
